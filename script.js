@@ -18,6 +18,21 @@ let gameInterval;
 
 document.addEventListener('keydown', changeDirection);
 
+// Suporte para cantos arredondados
+CanvasRenderingContext2D.prototype.roundRect = function (x, y, width, height, radius) {
+  this.beginPath();
+  this.moveTo(x + radius, y);
+  this.lineTo(x + width - radius, y);
+  this.quadraticCurveTo(x + width, y, x + width, y + radius);
+  this.lineTo(x + width, y + height - radius);
+  this.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  this.lineTo(x + radius, y + height);
+  this.quadraticCurveTo(x, y + height, x, y + height - radius);
+  this.lineTo(x, y + radius);
+  this.quadraticCurveTo(x, y, x + radius, y);
+  this.closePath();
+};
+
 function changeDirection(event) {
   const key = event.keyCode;
   if (key === 37 && direction !== 'RIGHT') direction = 'LEFT';
@@ -36,17 +51,22 @@ function generateFood() {
 function draw() {
   ctx.clearRect(0, 0, canvasSize, canvasSize);
 
-  // Draw food
-  ctx.fillStyle = 'red';
-  ctx.fillRect(food.x, food.y, box, box);
+  // Comida (maçã)
+  ctx.fillStyle = '#e74c3c';
+  ctx.beginPath();
+  ctx.arc(food.x + box / 2, food.y + box / 2, box / 2.5, 0, Math.PI * 2);
+  ctx.fill();
 
-  // Draw snake
+  // Cobra
   for (let i = 0; i < snake.length; i++) {
-    ctx.fillStyle = i === 0 ? 'green' : 'lightgreen';
-    ctx.fillRect(snake[i].x, snake[i].y, box, box);
+    ctx.fillStyle = i === 0 ? '#4CAF50' : '#81C784'; // Cabeça e corpo
+    ctx.strokeStyle = '#558B2F';
+    ctx.lineWidth = 2;
+    ctx.roundRect(snake[i].x, snake[i].y, box, box, 6);
+    ctx.fill();
+    ctx.stroke();
   }
 
-  // Move snake
   let headX = snake[0].x;
   let headY = snake[0].y;
 
@@ -55,13 +75,12 @@ function draw() {
   if (direction === 'RIGHT') headX += box;
   if (direction === 'DOWN') headY += box;
 
-  // Check collision with walls
+  // Colisões
   if (headX < 0 || headX >= canvasSize || headY < 0 || headY >= canvasSize) {
     gameOver();
     return;
   }
 
-  // Check collision with self
   for (let i = 0; i < snake.length; i++) {
     if (headX === snake[i].x && headY === snake[i].y) {
       gameOver();
@@ -69,7 +88,7 @@ function draw() {
     }
   }
 
-  // Check if food is eaten
+  // Comer
   if (headX === food.x && headY === food.y) {
     score++;
     scoreElement.textContent = score;
@@ -80,7 +99,7 @@ function draw() {
     }
     food = generateFood();
 
-    // Increase speed
+    // Aumentar velocidade
     clearInterval(gameInterval);
     speed = Math.max(50, speed - 5);
     gameInterval = setInterval(draw, speed);
@@ -88,7 +107,6 @@ function draw() {
     snake.pop();
   }
 
-  // Add new head
   const newHead = { x: headX, y: headY };
   snake.unshift(newHead);
 }
@@ -96,7 +114,6 @@ function draw() {
 function gameOver() {
   clearInterval(gameInterval);
   alert('Fim de jogo! Sua pontuação: ' + score);
-  // Reset game
   snake = [{ x: 9 * box, y: 9 * box }];
   direction = 'RIGHT';
   food = generateFood();

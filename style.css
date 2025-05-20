@@ -1,22 +1,28 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Arial', sans-serif;
     text-align: center;
-    background-color: #f0f0f0;
+    background-color: #b5a574; /* Bege escuro */
+    margin: 0;
+    padding: 0;
   }
   
   h1 {
     margin-top: 20px;
+    color: #3e3e3e;
   }
   
   .score-container {
     margin: 10px 0;
     font-size: 18px;
+    color: #3e3e3e;
   }
   
   canvas {
-    background-color: #000;
+    background-color: #f7e38d; /* Bege claro */
     display: block;
-    margin: 0 auto;
-    border: 2px solid #333;
+    margin: 20px auto;
+    border: 10px solid #b5a574;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #b5a574;
   }
   
